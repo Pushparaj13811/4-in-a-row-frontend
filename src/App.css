@@ -1,42 +1,517 @@
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #0F172A;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Root Layout */
 #root {
-  max-width: 1280px;
   margin: 0 auto;
+  padding: 0;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: #0F172A;
+  padding: 1rem;
+}
+
+/* Connection Status Indicator */
+.connection-status {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 1000;
+  transition: all 0.2s ease;
+}
+
+.connection-status.connecting {
+  background-color: #F59E0B;
+  color: #0F172A;
+}
+
+.connection-status.connected {
+  background-color: #22C55E;
+  color: #0F172A;
+}
+
+.connection-status.disconnected {
+  background-color: #F87171;
+  color: #0F172A;
+}
+
+/* Error Message */
+.error-message {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #F87171;
+  color: #0F172A;
+  padding: 12px 24px;
+  border-radius: 8px;
+  z-index: 1000;
+  animation: slideDown 0.3s ease-out;
+  max-width: 90%;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Reconnect Prompt */
+.reconnect-prompt {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.reconnect-content {
+  background: #1E293B;
   padding: 2rem;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.reconnect-content h3 {
+  color: #38BDF8;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
 }
 
-@keyframes logo-spin {
+.reconnect-content p {
+  color: #E5E7EB;
+  margin: 0.5rem 0;
+}
+
+.reconnect-username {
+  color: #94A3B8;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem !important;
+}
+
+.reconnect-username strong {
+  color: #38BDF8;
+  font-weight: 600;
+}
+
+.reconnect-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.reconnect-actions button {
+  flex: 1;
+}
+
+@keyframes slideDown {
   from {
-    transform: rotate(0deg);
+    transform: translateX(-50%) translateY(-20px);
+    opacity: 0;
   }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Screen Container */
+.screen {
+  width: 100%;
+  max-width: 600px;
+  padding: 2rem;
+  background: #1E293B;
+  border-radius: 12px;
+  animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== LOGIN SCREEN ========== */
+.login-screen {
+  text-align: center;
+}
+
+.logo-container {
+  margin-bottom: 2rem;
+}
+
+.game-title {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #38BDF8;
+  font-weight: 700;
+}
+
+.game-subtitle {
+  font-size: 1rem;
+  color: #94A3B8;
+  margin-top: 0;
+  font-weight: 400;
+}
+
+.login-form {
+  margin-bottom: 1.5rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #E5E7EB;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 1rem;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  background-color: #0F172A;
+  color: #E5E7EB;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input-group input::placeholder {
+  color: #64748B;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #38BDF8;
+  background-color: #1E293B;
+}
+
+.input-group input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary {
+  width: 100%;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.btn-primary {
+  background-color: #38BDF8;
+  color: #0F172A;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #0EA5E9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid #38BDF8;
+  color: #38BDF8;
+}
+
+.btn-secondary:hover {
+  background-color: #1E293B;
+}
+
+.game-info {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #0F172A;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.game-info h3 {
+  margin-top: 0;
+  color: #38BDF8;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.game-info ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.game-info li {
+  margin-bottom: 0.5rem;
+  color: #94A3B8;
+  line-height: 1.6;
+}
+
+/* ========== WAITING SCREEN ========== */
+.waiting-screen {
+  text-align: center;
+}
+
+.waiting-screen h1 {
+  color: #E5E7EB;
+  margin-bottom: 1rem;
+}
+
+.waiting-animation {
+  margin: 2rem 0;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid #1E293B;
+  border-top-color: #38BDF8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
   to {
     transform: rotate(360deg);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+.waiting-text {
+  font-size: 1rem;
+  color: #E5E7EB;
+  margin: 1rem 0;
+}
+
+.username-display {
+  font-size: 0.875rem;
+  color: #94A3B8;
+}
+
+.username-display strong {
+  color: #38BDF8;
+  font-weight: 600;
+}
+
+/* ========== PLAYING SCREEN ========== */
+.playing-screen {
+  text-align: center;
+  max-width: 800px;
+}
+
+.game-header {
+  margin-bottom: 2rem;
+}
+
+.player-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.player-card {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #0F172A;
+  border: 1px solid #334155;
+  transition: all 0.2s ease;
+}
+
+.player-card.red {
+  border-color: #F87171;
+}
+
+.player-card.yellow {
+  border-color: #FBBF24;
+}
+
+.player-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #E5E7EB;
+}
+
+.player-color {
+  font-size: 0.875rem;
+  color: #94A3B8;
+  margin-left: 0.5rem;
+}
+
+.vs-divider {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #64748B;
+}
+
+.turn-indicator {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.your-turn {
+  color: #22C55E;
+}
+
+.opponent-turn {
+  color: #64748B;
+}
+
+.keyboard-hint {
+  text-align: center;
+  margin-top: 1rem;
+  color: #94A3B8;
+  font-size: 0.875rem;
+}
+
+/* ========== FINISHED SCREEN ========== */
+.finished-screen {
+  text-align: center;
+  max-width: 800px;
+}
+
+.result-banner {
+  padding: 2rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.result-banner.win {
+  background-color: #22C55E;
+  color: #0F172A;
+}
+
+.result-banner.lose {
+  background-color: #F87171;
+  color: #0F172A;
+}
+
+.result-banner.draw {
+  background-color: #FBBF24;
+  color: #0F172A;
+}
+
+.result-banner h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.game-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.game-actions .btn-primary,
+.game-actions .btn-secondary {
+  width: auto;
+  min-width: 150px;
+  flex: 1;
+  max-width: 200px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  #root {
+    padding: 0.5rem;
+  }
+
+  .screen {
+    padding: 1.5rem;
+  }
+
+  .game-title {
+    font-size: 2rem;
+  }
+
+  .player-info {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .result-banner h1 {
+    font-size: 1.5rem;
+  }
+
+  .game-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .game-actions .btn-primary,
+  .game-actions .btn-secondary {
+    width: 100%;
+    max-width: none;
   }
 }
 
-.card {
-  padding: 2em;
-}
+@media (max-width: 480px) {
+  .game-title {
+    font-size: 1.75rem;
+  }
 
-.read-the-docs {
-  color: #888;
+  .connection-status {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+  }
 }
