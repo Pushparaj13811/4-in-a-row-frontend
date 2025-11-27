@@ -2,9 +2,14 @@
 
 A beautiful, real-time multiplayer **4-in-a-Row** (Connect Four) game built with **React**, **TypeScript**, and **WebSockets**.
 
-**Repository:** [https://github.com/Pushparaj13811/4-in-a-row-frontend](https://github.com/Pushparaj13811/4-in-a-row-frontend)
+## Repository Links
 
-**Backend Repository:** [https://github.com/Pushparaj13811/4-in-a-row](https://github.com/Pushparaj13811/4-in-a-row)
+This project is split into two separate repositories:
+
+- **Frontend (this repo):** [https://github.com/Pushparaj13811/4-in-a-row-frontend](https://github.com/Pushparaj13811/4-in-a-row-frontend)
+- **Backend:** [https://github.com/Pushparaj13811/4-in-a-row](https://github.com/Pushparaj13811/4-in-a-row)
+
+**Important:** You need BOTH repositories to run the complete application. Clone both repos to get started.
 
 ## What is this?
 
@@ -16,38 +21,50 @@ This is the frontend web application for a multiplayer Connect Four game. Featur
 - Keyboard controls for faster gameplay
 - Beautiful dark-themed UI with smooth animations
 
-## How to Run This Application
+## Complete Setup Guide
+
+This application requires both the frontend and backend to work. Follow these steps:
 
 ### Prerequisites
 
 Make sure you have these installed:
 - **Node.js** (version 18 or higher) - [Download here](https://nodejs.org/)
-- **Backend server running** - See backend README for setup instructions
+- **PostgreSQL** (version 12 or higher) - Required by backend
+- **Git** - To clone repositories
 
 ### Step-by-Step Setup
 
-#### Step 1: Make Sure Backend is Running
+#### Step 1: Clone Both Repositories
 
-Before starting the frontend, you need the backend server running. Open a terminal and:
+You need to clone both the frontend and backend repositories:
 
 ```bash
-# Navigate to backend folder
-cd ../backend
+# Clone the backend
+git clone https://github.com/Pushparaj13811/4-in-a-row.git
+cd 4-in-a-row
 
-# Start the backend (if not already running)
-npm run dev
+# Clone the frontend (in a separate directory)
+cd ..
+git clone https://github.com/Pushparaj13811/4-in-a-row-frontend.git
+cd 4-in-a-row-frontend
 ```
 
-You should see:
-```
-🚀 WebSocket server running on ws://localhost:3001
-```
+#### Step 2: Set Up and Start the Backend First
 
-Keep this terminal open and running!
+The frontend needs the backend to be running. Follow the backend setup instructions:
 
-#### Step 2: Install Frontend Dependencies
+1. Navigate to the backend repository folder
+2. Follow the complete setup guide in the backend README
+3. Start the backend server with `npm run dev`
+4. Ensure you see: `🚀 WebSocket server running on ws://localhost:3001`
 
-Open a **new terminal** window, navigate to the frontend folder, and run:
+**Keep the backend terminal open and running!**
+
+See the [Backend README](https://github.com/Pushparaj13811/4-in-a-row#readme) for detailed backend setup instructions.
+
+#### Step 3: Install Frontend Dependencies
+
+Open a **new terminal** window (keep backend running in the other terminal), navigate to the frontend folder, and run:
 
 ```bash
 npm install
@@ -55,7 +72,7 @@ npm install
 
 This installs all required packages (React, Vite, TypeScript, etc.).
 
-#### Step 3: Start the Frontend
+#### Step 4: Start the Frontend
 
 ```bash
 npm run dev
@@ -70,7 +87,7 @@ VITE v7.2.4  ready in 500 ms
 ➜  Network: use --host to expose
 ```
 
-#### Step 4: Play the Game!
+#### Step 5: Play the Game!
 
 1. Open your browser and go to `http://localhost:5173/`
 2. Enter a username (3-20 characters)
