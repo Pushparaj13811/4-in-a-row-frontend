@@ -2,6 +2,10 @@
 
 A beautiful, real-time multiplayer **4-in-a-Row** (Connect Four) game built with **React**, **TypeScript**, and **WebSockets**.
 
+**Repository:** [https://github.com/Pushparaj13811/4-in-a-row-frontend](https://github.com/Pushparaj13811/4-in-a-row-frontend)
+
+**Backend Repository:** [https://github.com/Pushparaj13811/4-in-a-row](https://github.com/Pushparaj13811/4-in-a-row)
+
 ## What is this?
 
 This is the frontend web application for a multiplayer Connect Four game. Features include:
