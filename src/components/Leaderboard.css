@@ -1,0 +1,181 @@
+.leaderboard-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.leaderboard-modal {
+  background: #1E293B;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 800px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.leaderboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #334155;
+}
+
+.leaderboard-header h2 {
+  margin: 0;
+  color: #38BDF8;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.close-button {
+  background: transparent;
+  border: 1px solid #38BDF8;
+  color: #38BDF8;
+  font-size: 1.25rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.close-button:hover {
+  background: #38BDF8;
+  color: #0F172A;
+}
+
+.leaderboard-content {
+  color: #E5E7EB;
+}
+
+.empty-message {
+  text-align: center;
+  color: #94A3B8;
+  padding: 2rem;
+  font-size: 1rem;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard-table thead {
+  background: #0F172A;
+}
+
+.leaderboard-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #38BDF8;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #334155;
+}
+
+.leaderboard-table td {
+  padding: 12px;
+  border-bottom: 1px solid #334155;
+  font-size: 0.875rem;
+}
+
+.leaderboard-table tr:hover {
+  background: rgba(56, 189, 248, 0.05);
+}
+
+.leaderboard-table tr.top-three {
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.rank {
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  width: 60px;
+  color: #94A3B8;
+}
+
+.username {
+  font-weight: 600;
+  color: #E5E7EB;
+}
+
+.wins {
+  color: #22C55E;
+  font-weight: 600;
+}
+
+.losses {
+  color: #F87171;
+  font-weight: 600;
+}
+
+.draws {
+  color: #FBBF24;
+  font-weight: 600;
+}
+
+.total {
+  font-weight: 600;
+  color: #94A3B8;
+}
+
+.win-rate {
+  color: #38BDF8;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .leaderboard-modal {
+    padding: 1.5rem;
+  }
+
+  .leaderboard-table {
+    font-size: 0.75rem;
+  }
+
+  .leaderboard-table th,
+  .leaderboard-table td {
+    padding: 8px 6px;
+  }
+
+  .rank {
+    font-size: 0.875rem;
+  }
+}
