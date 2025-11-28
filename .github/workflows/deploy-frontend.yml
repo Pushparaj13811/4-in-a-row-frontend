@@ -72,53 +72,8 @@ jobs:
             sudo chown -R www-data:www-data /var/www/pushparaj
             sudo chmod -R 755 /var/www/pushparaj
 
-            # Check if Nginx is installed
-            if ! command -v nginx &> /dev/null; then
-              echo "⚠️ Warning: Nginx not installed. Installing..."
-              sudo apt update && sudo apt install -y nginx
-            fi
-
-            # Create Nginx config if it doesn't exist
-            if [ ! -f /etc/nginx/sites-available/4-in-a-row ]; then
-              echo "Creating Nginx configuration..."
-              sudo tee /etc/nginx/sites-available/4-in-a-row > /dev/null <<'NGINX'
-            server {
-                listen 80;
-                server_name _;
-
-                root /var/www/pushparaj;
-                index index.html;
-
-                # Enable gzip compression
-                gzip on;
-                gzip_vary on;
-                gzip_min_length 1024;
-                gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
-
-                location / {
-                    try_files $uri $uri/ /index.html;
-                }
-
-                # Cache static assets
-                location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-                    expires 1y;
-                    add_header Cache-Control "public, immutable";
-                }
-
-                # Security headers
-                add_header X-Frame-Options "SAMEORIGIN" always;
-                add_header X-Content-Type-Options "nosniff" always;
-                add_header X-XSS-Protection "1; mode=block" always;
-            }
-            NGINX
-
-              # Enable site
-              sudo ln -s /etc/nginx/sites-available/4-in-a-row /etc/nginx/sites-enabled/ || true
-              sudo rm -f /etc/nginx/sites-enabled/default
-            fi
-
-            # Test and reload nginx
-            sudo nginx -t && sudo systemctl reload nginx
+            # Reload nginx to pick up new files
+            sudo systemctl reload nginx
 
             # Cleanup
             rm /tmp/frontend-dist.tar.gz
@@ -130,12 +85,25 @@ jobs:
       - name: Verify deployment
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
+          echo "$EC2_SSH_KEY" > ec2_key.pem
+          chmod 600 ec2_key.pem
+
           sleep 3
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://${EC2_HOST})
-          if [ $HTTP_CODE -eq 200 ]; then
-            echo "✅ Frontend deployed successfully"
-          else
-            echo "❌ Deployment verification failed (HTTP $HTTP_CODE)"
-            exit 1
-          fi
+
+          # Check if files were deployed
+          ssh -i ec2_key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+            if [ -f /var/www/pushparaj/index.html ]; then
+              echo "✅ Frontend files deployed successfully"
+              echo "📁 Deployed files:"
+              ls -lh /var/www/pushparaj/ | head -n 10
+              exit 0
+            else
+              echo "❌ Frontend deployment verification failed"
+              exit 1
+            fi
+          EOF
+
+          rm ec2_key.pem
