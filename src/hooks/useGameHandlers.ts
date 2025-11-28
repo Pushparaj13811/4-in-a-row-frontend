@@ -17,6 +17,7 @@ interface UseGameHandlersProps {
   resetGameState: () => void;
   saveGameSession: (gameId: string, username: string) => void;
   setShowReconnectPrompt: (show: boolean) => void;
+  setScreen: (screen: any) => void;
 }
 
 export function useGameHandlers({
@@ -32,6 +33,7 @@ export function useGameHandlers({
   resetGameState,
   saveGameSession,
   setShowReconnectPrompt,
+  setScreen,
 }: UseGameHandlersProps) {
 
   const handleLogin = useCallback((e: React.FormEvent) => {
@@ -110,7 +112,8 @@ export function useGameHandlers({
     setUsername('');
     setIsJoining(false);
     setShowReconnectPrompt(false);
-  }, [username, resetGameState, setUsername, setIsJoining, setShowReconnectPrompt]);
+    setScreen('login');
+  }, [username, resetGameState, setUsername, setIsJoining, setShowReconnectPrompt, setScreen]);
 
   return {
     handleLogin,

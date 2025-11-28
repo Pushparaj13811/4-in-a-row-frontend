@@ -108,6 +108,7 @@ function App() {
     resetGameState,
     saveGameSession,
     setShowReconnectPrompt,
+    setScreen,
   });
 
   // Refs for timers
