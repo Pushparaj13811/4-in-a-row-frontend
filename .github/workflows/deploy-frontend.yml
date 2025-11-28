@@ -55,9 +55,12 @@ jobs:
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
             set -e
 
+            # Create frontend directory if it doesn't exist
+            sudo mkdir -p /var/www/pushparaj
+
             # Backup existing files
             sudo mkdir -p /var/www/pushparaj.backup
-            sudo cp -r /var/www/pushparaj/* /var/www/pushparaj.backup/ || true
+            sudo cp -r /var/www/pushparaj/* /var/www/pushparaj.backup/ 2>/dev/null || true
 
             # Clear old files
             sudo rm -rf /var/www/pushparaj/*
@@ -69,7 +72,52 @@ jobs:
             sudo chown -R www-data:www-data /var/www/pushparaj
             sudo chmod -R 755 /var/www/pushparaj
 
-            # Reload nginx
+            # Check if Nginx is installed
+            if ! command -v nginx &> /dev/null; then
+              echo "⚠️ Warning: Nginx not installed. Installing..."
+              sudo apt update && sudo apt install -y nginx
+            fi
+
+            # Create Nginx config if it doesn't exist
+            if [ ! -f /etc/nginx/sites-available/4-in-a-row ]; then
+              echo "Creating Nginx configuration..."
+              sudo tee /etc/nginx/sites-available/4-in-a-row > /dev/null <<NGINX
+server {
+    listen 80;
+    server_name _;
+
+    root /var/www/pushparaj;
+    index index.html;
+
+    # Enable gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+
+    location / {
+        try_files \$uri \$uri/ /index.html;
+    }
+
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+}
+NGINX
+
+              # Enable site
+              sudo ln -s /etc/nginx/sites-available/4-in-a-row /etc/nginx/sites-enabled/ || true
+              sudo rm -f /etc/nginx/sites-enabled/default
+            fi
+
+            # Test and reload nginx
             sudo nginx -t && sudo systemctl reload nginx
 
             # Cleanup
