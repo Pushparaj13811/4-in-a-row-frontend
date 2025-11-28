@@ -16,4 +16,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  esbuild: {
+    drop: ['console', 'debugger'], // Remove console.log and debugger in production
+  },
 })
