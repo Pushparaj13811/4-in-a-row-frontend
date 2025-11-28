@@ -21,40 +21,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build frontend
-        env:
-          VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
-        run: npm run build
-
       - name: Deploy to EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          VITE_WS_URL: ${{ secrets.VITE_WS_URL }}
         run: |
           echo "$EC2_SSH_KEY" > ec2_key.pem
           chmod 600 ec2_key.pem
 
-          # Create deployment package
-          tar -czf frontend-dist.tar.gz -C dist .
+          # Create deployment package (source files)
+          tar -czf frontend-source.tar.gz --exclude=node_modules --exclude=dist --exclude=.git .
 
           # Copy to EC2
           scp -i ec2_key.pem -o StrictHostKeyChecking=no \
-            frontend-dist.tar.gz ${EC2_USER}@${EC2_HOST}:/tmp/
+            frontend-source.tar.gz ${EC2_USER}@${EC2_HOST}:/tmp/
 
           # Deploy on EC2
-          ssh -i ec2_key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+          ssh -i ec2_key.pem -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
             set -e
 
-            # Create frontend directory if it doesn't exist
+            # Create frontend build directory
+            mkdir -p /home/ubuntu/GATI-mail-backend/test/4-in-a-row-frontend
+
+            # Extract source files
+            cd /home/ubuntu/GATI-mail-backend/test/4-in-a-row-frontend
+            tar -xzf /tmp/frontend-source.tar.gz
+
+            # Install dependencies and build on server
+            npm ci
+            VITE_WS_URL="${VITE_WS_URL}" npm run build
+
+            # Create web directory if it doesn't exist
             sudo mkdir -p /var/www/pushparaj
 
             # Backup existing files
@@ -64,8 +63,8 @@ jobs:
             # Clear old files
             sudo rm -rf /var/www/pushparaj/*
 
-            # Extract new build
-            sudo tar -xzf /tmp/frontend-dist.tar.gz -C /var/www/pushparaj/
+            # Copy new build to web directory
+            sudo cp -r dist/* /var/www/pushparaj/
 
             # Set correct permissions
             sudo chown -R www-data:www-data /var/www/pushparaj
@@ -75,7 +74,7 @@ jobs:
             sudo systemctl reload nginx
 
             # Cleanup
-            rm /tmp/frontend-dist.tar.gz
+            rm /tmp/frontend-source.tar.gz
           EOF
 
           # Cleanup local key
