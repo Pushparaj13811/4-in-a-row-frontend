@@ -38,6 +38,8 @@ function App() {
   const [isJoining, setIsJoining] = useState(false);
   const [showReconnectPrompt, setShowReconnectPrompt] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const [opponentDisconnected, setOpponentDisconnected] = useState(false);
+  const [reconnectTimeLeft, setReconnectTimeLeft] = useState(30);
 
   // Game state
   const [gameState, setGameState] = useState<GameState>(INITIAL_GAME_STATE);
@@ -82,6 +84,7 @@ function App() {
         setScreen('playing');
         setIsJoining(false);
         setShowReconnectPrompt(false);
+        setOpponentDisconnected(false);
         reconnectAttemptsRef.current = 0;
         wasDisconnectedRef.current = false;
 
@@ -100,6 +103,8 @@ function App() {
           currentPlayer: message.currentPlayer,
           winner: message.winner,
         }));
+        // Clear opponent disconnected state when receiving a move (opponent has reconnected)
+        setOpponentDisconnected(false);
         if (message.winner) {
           setScreen('finished');
           wasDisconnectedRef.current = false; // Game ended normally, not a disconnect
@@ -120,6 +125,7 @@ function App() {
         });
         setScreen('playing');
         setShowReconnectPrompt(false);
+        setOpponentDisconnected(false);
         setErrorMessage('');
         reconnectAttemptsRef.current = 0;
         break;
@@ -132,6 +138,26 @@ function App() {
         setErrorMessage(message.message);
         setIsJoining(false);
         setTimeout(() => setErrorMessage(''), 5000);
+        break;
+
+      case 'opponentDisconnected':
+        setOpponentDisconnected(true);
+        setReconnectTimeLeft(30);
+        setErrorMessage('');
+        break;
+
+      case 'opponentLeft':
+        // Opponent didn't reconnect in time - game is forfeited
+        setOpponentDisconnected(false);
+        setGameState((prev) => ({
+          ...prev,
+          winner: message.winner,
+        }));
+        setScreen('finished');
+        wasDisconnectedRef.current = false;
+        // Clear session when game ends
+        storage.remove(STORAGE_KEYS.GAME_ID);
+        storage.remove(STORAGE_KEYS.USERNAME);
         break;
     }
   }, []);
@@ -278,6 +304,22 @@ function App() {
     }
   }, [screen, waitingTimeLeft]);
 
+  // Opponent reconnection countdown timer
+  useEffect(() => {
+    if (opponentDisconnected && reconnectTimeLeft > 0) {
+      const timer = setInterval(() => {
+        setReconnectTimeLeft((prev) => {
+          if (prev <= 1) {
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [opponentDisconnected, reconnectTimeLeft]);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -360,6 +402,13 @@ function App() {
 
   // Handle column click
   const handleColumnClick = (column: number) => {
+    // Don't allow moves if opponent is disconnected or if it's not your turn
+    if (opponentDisconnected) {
+      setErrorMessage('Cannot make moves while opponent is disconnected');
+      setTimeout(() => setErrorMessage(''), 3000);
+      return;
+    }
+
     if (gameState.gameId && gameState.yourColor === gameState.currentPlayer && !gameState.winner) {
       wsService.makeMove(gameState.gameId, column);
     }
@@ -511,6 +560,27 @@ function App() {
 
     return (
       <div className="screen playing-screen">
+        {/* Opponent disconnect notification */}
+        {opponentDisconnected && (
+          <div className="opponent-disconnect-banner">
+            <span className="disconnect-icon">⚠️</span>
+            <div className="disconnect-content">
+              <span className="disconnect-title">Opponent Disconnected</span>
+              <span className="disconnect-timer">
+                {reconnectTimeLeft > 0 ? (
+                  <>
+                    <span className="timer-icon">⏱️</span>
+                    <span className="timer-value">{reconnectTimeLeft}s</span>
+                    <span className="timer-label">to reconnect</span>
+                  </>
+                ) : (
+                  <span className="timer-expired">Waiting for server...</span>
+                )}
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="game-header">
           <div className="player-info">
             <div className={`player-card ${gameState.yourColor || ''}`}>
@@ -518,14 +588,17 @@ function App() {
               <span className="player-color">({gameState.yourColor})</span>
             </div>
             <div className="vs-divider">VS</div>
-            <div className={`player-card ${opponentColor || ''}`}>
+            <div className={`player-card ${opponentColor || ''} ${opponentDisconnected ? 'disconnected' : ''}`}>
               <span className="player-name">{opponentName}</span>
               <span className="player-color">({opponentColor})</span>
+              {opponentDisconnected && <span className="disconnect-badge">Disconnected</span>}
             </div>
           </div>
 
           <div className="turn-indicator">
-            {isYourTurn ? (
+            {opponentDisconnected ? (
+              <span className="waiting-reconnect">Waiting for opponent...</span>
+            ) : isYourTurn ? (
               <span className="your-turn">Your Turn</span>
             ) : (
               <span className="opponent-turn">Opponent's Turn</span>
