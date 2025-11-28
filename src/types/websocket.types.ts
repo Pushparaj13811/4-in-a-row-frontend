@@ -52,13 +52,25 @@ export interface RejoinSuccessMessage {
   opponent: string | null;
 }
 
+export interface OpponentDisconnectedMessage {
+  type: 'opponentDisconnected';
+  message: string;
+}
+
+export interface OpponentLeftMessage {
+  type: 'opponentLeft';
+  winner: PlayerColor;
+}
+
 export type ServerMessage =
   | GameStartMessage
   | MoveMessage
   | WaitingMessage
   | LeaderboardMessage
   | ErrorMessage
-  | RejoinSuccessMessage;
+  | RejoinSuccessMessage
+  | OpponentDisconnectedMessage
+  | OpponentLeftMessage;
 
 // Client to Server Messages
 export interface JoinMessage {
