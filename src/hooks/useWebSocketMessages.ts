@@ -80,7 +80,6 @@ export function useWebSocketMessages({
         if (message.winner) {
           setScreen('finished');
           clearDisconnectFlag();
-          resetGameState();
         }
         break;
 
@@ -119,7 +118,6 @@ export function useWebSocketMessages({
         updateGameState({ winner: message.winner });
         setScreen('finished');
         clearDisconnectFlag();
-        resetGameState();
         break;
     }
   }, [
